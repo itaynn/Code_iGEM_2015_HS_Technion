@@ -1,0 +1,30 @@
+#**
+ *  Overall Facet display block
+ *  Invokes the 4 facet and 1 cluster template
+ *#
+
+#*
+<ul class="nav nav-tabs">
+  ...
+  <li role="presentation">Advanced Search</li>
+  <li role="presentation" class="dropdown">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+      Dropdown <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu">
+      <li>1</li>
+    </ul>
+  </li>
+  ...
+</ul>
+*#
+
+
+<ul class="navigation-ul pull-right hidden">
+<li class="navigation-li">#parse('facet_fields.vm')</li>
+<li>#parse('facet_queries.vm')</li>
+<li>#parse('facet_ranges.vm')</li>
+<li>#parse('facet_pivot.vm')</li>
+<li>#parse('cluster.vm')</li>
+</ul>
+

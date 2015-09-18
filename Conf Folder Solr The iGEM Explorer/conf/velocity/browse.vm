@@ -1,0 +1,40 @@
+#**
+ *  Main entry point into the /browse templates
+ *#
+
+#set($searcher = $request.searcher)
+#set($params = $request.params)
+#set($clusters = $response.response.clusters)
+#set($mltResults = $response.response.get("moreLikeThis"))
+#set($annotate = $params.get("annotateBrowse"))
+#parse('logo_and_rights.vm')
+
+#parse('query_form.vm')
+<br><br>
+
+
+<div class="navigators">
+  #parse("facets.vm")
+</div>
+
+<div class="cont-data">
+#parse('did_you_mean.vm')
+<div class="pagination pagination_top">
+   #parse("pagination_top.vm") 
+</div>
+<br><br><br><br>
+
+## Show Error Message, if any
+<div class="error">
+  #parse("error.vm")
+</div>
+
+## Render Results, actual matching docs
+<div class="results igem-results">
+  #parse("results_list.vm")
+</div>
+
+<div class="pagination pagination_bottom">
+  #parse("pagination_bottom.vm")
+</div>
+</div>

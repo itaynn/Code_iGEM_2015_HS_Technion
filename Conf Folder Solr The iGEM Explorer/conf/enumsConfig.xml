@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<enumsConfig>
+  <enum name="medal">
+    <value>No Medal</value>
+    <value>Gold</value>
+    <value>Silver</value>
+    <value>Bronze</value>
+    
+  </enum>
+</enumsConfig>

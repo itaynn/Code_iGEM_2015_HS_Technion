@@ -1,0 +1,15 @@
+#**
+ *  Hyperlinked spelling suggestions in results list
+ *#
+
+
+#set($collations = $response.response.spellcheck.collations.getAll("collation"))
+<div class="cont-did-you-mean">
+#if($collations.size() > 0)
+  <span class="text-did-you-mean text-did-you-mean-ac">Did you mean:</span>
+  #foreach($collation in $collations)
+    <a class="text-did-you-mean text-did-you-mean-link" href="#{url_for_home}#{lensNoQ}&q=$esc.url($collation.collationQuery)">$esc.html($collation.collationQuery)</a> <span class="text-did-you-mean text-did-you-mean-number">($collation.hits)?</span>
+  #end
+  <br><br><br>
+#end
+</div>

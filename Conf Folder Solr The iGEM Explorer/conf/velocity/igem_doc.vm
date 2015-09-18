@@ -1,0 +1,249 @@
+#**
+ *  Display documents that are iGEM documents
+ *#
+ 
+
+## Load Mime-Type List and Mapping 							MAP STUFF
+#parse('mime_type_lists.vm')
+## Sets:
+## * supportedMimeTypes, AKA supportedtypes
+## * mimeExtensionsMap, AKA extMap
+
+## Title
+
+#**
+#set($title = "["+$doc.getFieldValue('id')+"]")
+  #set($title = $esc.html($doc.getFirstValue('title')))
+#else
+  #set($title = "["+$doc.getFieldValue('id')+"]")
+#end
+*#
+
+#**
+<div class="result-title">
+  <b><a class="text-danger" href=#field('wikiurl')>#field('name')#field('year')</a></b>
+</div>
+*#
+
+
+#set($tabsId = $docId+"tabs")
+
+#set($mainTabId = $docId+"mainTab")
+#set($abstractTabId = $docId+"abstractTab")
+#set($infoTabId = $docId+"infoTab")
+#set($mltTabId = $docId+"mltTab")
+
+#set($logoLinkId = $docId+"linklogo")
+#set($mainTabLinkId = $docId+"linkmain")
+#set($abstractTabLinkId = $docId+"linkabstract")
+#set($infoTabLinkId = $docId+"linkinfo")
+#set($mltTabLinkId = $docId+"linkmlt")
+
+#set($shortAbstractId = $docId+"shortAbstract")
+#set($abstractId = $docId+"abstract")
+#set($logoId = $docId+"logo")
+#set($sectionId = $docId+"section")
+#** #set($docLogo = $doc.getFieldValue('logo')) *#
+
+#set($ct = $list.get($doc.getFirstValue('content_type').split(";"),0))
+#set($filename = $doc.getFieldValue('resourcename'))
+
+
+<div class="">
+  <ul class="nav nav-tabs igem-doc-nav">
+    <li><a class="igem-doc-subtitle" href=#field('wikiurl')><img id="$logoLinkId" src="http://www.stockboard.com/media/images/default-logo.png"/></a></li>
+    <li ><a id="$mainTabLinkId" class="igem-doc-title" onclick="openTab('$docId','main');">#field('name')#field('year')</a></li>
+    <li ><a id="$abstractTabLinkId" class="igem-doc-subtitle" onclick="openTab('$docId','abstract');">Abstract</a></li>
+    <li ><a id="$infoTabLinkId" class="igem-doc-subtitle" onclick="openTab('$docId','info');">Info</a></li>
+    <li >
+      #if($params.getBool('mlt', false) == false)
+        <a id="$mltTabLinkId" class="igem-doc-subtitle" href="#lensNoQ&q=id:%22$docId%22&mlt=true">
+          More Like This</a>
+      #else
+        <a id="$mltTabLinkId" class="igem-doc-subtitle" onclick="mltNotFound('$docId');">More Like This</a>
+
+      #end
+    </li>
+  </ul>
+
+
+  <div class="tab-content igem-doc-text" id="$tabsId">
+    <div class="tab-pane" id="$mainTabId">
+      <span id="$shortAbstractId"></span><br><br>
+      <u>Id:</u> $docId<br>
+      #**
+      Logo: <img id="$logoId" src="    http://www.stockboard.com/media/images/default-logo.png   "/><br>
+      Wiki: <a href=#field('wikiurl')>#field('wikiurl')</a>
+      *#
+    </div>
+    <div class="tab-pane" id="$abstractTabId">
+      <div id="$abstractId"></div>
+    </div>
+    <div class="tab-pane" id="$infoTabId">
+      <u>School:</u> #field('school')<br>
+      <u>Year:</u> #field('year')<br>
+      <u>Section:</u> <span id="$sectionId"></span><br>
+      <u>Track:</u> #field('track')<br>
+      <u>Region:</u> #field('region')<br>
+      <u>Medals:</u> #field('medal')<br>
+      <u>Awards:</u> #field('award')<br>
+    </div>
+    <div class="tab-pane" id="$mltTabId">
+
+      <div class="mlt" id="cont-mlt">
+        #set($mlt = $mltResults.get($docId))
+        #set($mltOn = $params.getBool('mlt'))
+        #if($mltOn == true)
+          <div class="field-name">
+            Similar Items
+          </div>
+        #end
+        ## If has MLT enabled An Entries to show
+        #if ($mltOn && $mlt && $mlt.size() > 0)
+          <ul>
+            #foreach($mltHit in $mlt)
+              #set($mltId = $mltHit.getFieldValue('id'))
+              <li>
+                <div>
+                  <a href="#url_for_home?q=id:$mltId">
+                    $mltId</a>
+                </div>
+                <div>
+                  <span class="field-name">
+                    Title:
+                  </span>
+                  $mltHit.getFieldValue('title')
+                </div>
+                <div>
+                  <span class="field-name">
+                    Author:
+                  </span>
+                  $mltHit.getFieldValue('author')
+                  <span class="field-name">
+                    Description:
+                  </span>
+                  $mltHit.getFieldValue('description')
+                </div>
+              </li>
+            #end    ## end for each mltHit in $mlt
+          </ul>
+        ## Else MLT Enabled but no mlt results for this query
+        #elseif($mltOn && $mlt.size() == 0)
+          <div>No Similar Items Found</div>
+        #end
+      </div>  ## div class=mlt
+
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+  function mltNotFound(docId){
+    openTab(docId,"mlt");
+    populate(docId,"cont-mlt","More Like This NOT SUPPORTED");
+  }
+  function openTab(docId,tab){
+    $("#"+docId+"mainTab").hide();
+    $("#"+docId+"abstractTab").hide();
+    $("#"+docId+"infoTab").hide();
+    $("#"+docId+"mltTab").hide();
+
+    $("#"+docId+"link"+"main").removeClass("igem-doc-tab-active");
+    $("#"+docId+"link"+"abstract").removeClass("igem-doc-tab-active");
+    $("#"+docId+"link"+"info").removeClass("igem-doc-tab-active");
+    $("#"+docId+"link"+"mlt").removeClass("igem-doc-tab-active");
+
+    $("#"+docId+tab+"Tab").show();
+    $("#"+docId+"link"+tab).addClass("igem-doc-tab-active");
+  }
+
+  function populate(docId,div,text){ 
+    $("#"+docId+div).html(text);
+  }
+
+  function populateLogo(docId,logo){
+    logo.replace(/\s/g, "");
+    logo=logo.substr(6);
+    
+    if(logo[0]==" ")
+      return;
+    if(logo[0]!='h')
+      logo="http://".concat(logo);
+    $("#"+docId+"linklogo").attr("src",logo);
+
+  }
+
+  function resizeLogo(docId,width,height){
+    var logoObj=document.getElementById(""+docId+"linklogo");
+    var logoObjQ=$("#"+docId+"linklogo");
+    //logoObjQ.css("max-width",width+'px');
+    logoObjQ.css("height",height+'vw');
+    //should be changed
+  }
+
+  function aContainsB (a, b) {
+    return a.indexOf(b) >= 0;
+}
+
+  function main(){
+    var myDocId=$docId;
+    var myDocLogo="#field('logo')";
+    var abstract="";
+
+    abstract="#field('abstract_div')";
+
+    var shortAbstract="";
+    var shortAbstractLength=300;
+    if(abstract.length>shortAbstractLength)
+      shortAbstract=abstract.substring(0,shortAbstractLength)+" ...";
+    else
+      shortAbstract=abstract;
+    var sectionText="#field('section')".replace(/\s/g, "") ;
+    var divisionText="#field('division')".replace(/\s/g, "") ;
+    var section="";
+    if(divisionText!="")
+      section=divisionText;
+    if(sectionText!="")
+      section=sectionText;
+
+    populateLogo(myDocId,myDocLogo);
+    resizeLogo(myDocId,70,2.2);
+    console.log(abstract);
+    populate(myDocId,"shortAbstract",shortAbstract);
+    populate(myDocId,"abstract",abstract);
+    populate(myDocId,"section",section);
+
+    var currUrl=window.location.href;
+    if(aContainsB(currUrl,"&mlt=true"))
+      openTab(myDocId,"mlt");
+    else
+      openTab(myDocId,"main");
+
+  }
+
+  /*
+  TODO:
+    1)highlight
+    2)prizes
+    3)poster and presentation
+    4)overall looking(colors)
+   */
+
+  $(document).ready(main);
+  /*
+   $(document).ready(function(){
+        activaTab('#field('id')main');
+    });
+
+    function activaTab(tab){
+        $('.nav-tabs a[href="#' + tab + '"]').tab('show');
+    };
+    */
+</script>
+#**
+
+*#
+
+#parse('debug.vm')
